@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Apartment in Pari</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f7f4;
+    --text: #2c2c2c;
+    --text-light: #6b6b6b;
+    --accent: #b08d57;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    height: 70vh;
+    min-height: 400px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url('images/obyvacka.jpg') center/cover no-repeat;
+    filter: brightness(0.55);
+    z-index: 0;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    padding: 2rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  /* Section headings */
+  .section-title {
+    text-align: center;
+    padding: 3rem 1rem 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  /* Gallery grid */
+  .gallery {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .gallery-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .gallery-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+  .gallery-item .label {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: var(--text);
+  }
+  .gallery-item .label span {
+    color: var(--text-light);
+    font-weight: 300;
+    font-size: 0.8rem;
+  }
+
+  /* Featured: first item spans wider */
+  .gallery-item.featured {
+    grid-column: span 2;
+  }
+  .gallery-item.featured img {
+    height: 320px;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.92);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+  }
+  .lightbox.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
+
+  .lightbox-caption {
+    color: #ddd;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    line-height: 1;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.5rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    padding: 1rem;
+    line-height: 1;
+  }
+  .lightbox-nav:hover { opacity: 1; }
+  .lightbox-prev { left: 0.5rem; }
+  .lightbox-next { right: 0.5rem; }
+
+  .lightbox-counter {
+    position: absolute;
+    bottom: 1.5rem;
+    color: #999;
+    font-size: 0.85rem;
+    font-weight: 300;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-light);
+    font-size: 0.8rem;
+    border-top: 1px solid #e8e6e1;
+    margin-top: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; }
+    .gallery-item.featured { grid-column: span 1; }
+    .gallery-item.featured img { height: 220px; }
+    .gallery-item img { height: 180px; }
+    .hero { height: 50vh; min-height: 300px; }
+    .lightbox-nav { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1>Apartment in Pari</h1>
+    <p>Modern living &middot; Bright &amp; spacious &middot; Move-in ready</p>
+  </div>
+</div>
+
+<!-- Main Rooms -->
+<h2 class="section-title">The Apartment</h2>
+<p class="section-subtitle">Bright, modern interiors with quality finishes throughout</p>
+
+<div class="gallery" id="gallery-main">
+  <div class="gallery-item featured" data-img="images/obyvacka.jpg" data-label="Living Room">
+    <img src="thumbs/obyvacka.jpg" alt="Living Room" loading="lazy">
+    <div class="label">Living Room <span>&mdash; with balcony access</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/kuchyna.jpg" data-label="Kitchen">
+    <img src="thumbs/kuchyna.jpg" alt="Kitchen" loading="lazy">
+    <div class="label">Kitchen <span>&mdash; fully equipped</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/kuchyna2.jpg" data-label="Kitchen — Another View">
+    <img src="thumbs/kuchyna2.jpg" alt="Kitchen — Another View" loading="lazy">
+    <div class="label">Kitchen <span>&mdash; another view</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/kuchyna-overview.png" data-label="Kitchen Overview">
+    <img src="thumbs/kuchyna-overview.jpg" alt="Kitchen Overview" loading="lazy">
+    <div class="label">Kitchen <span>&mdash; overview</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/gauc.jpg" data-label="Sofa Area">
+    <img src="thumbs/gauc.jpg" alt="Sofa Area" loading="lazy">
+    <div class="label">Sofa Area <span>&mdash; air-conditioned</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/kupelna.jpg" data-label="Bathroom">
+    <img src="thumbs/kupelna.jpg" alt="Bathroom" loading="lazy">
+    <div class="label">Bathroom <span>&mdash; with bathtub</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/toaleta.jpg" data-label="Toilet">
+    <img src="thumbs/toaleta.jpg" alt="Toilet" loading="lazy">
+    <div class="label">Toilet <span>&mdash; separate</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/chodba.jpg" data-label="Hallway">
+    <img src="thumbs/chodba.jpg" alt="Hallway" loading="lazy">
+    <div class="label">Hallway</div>
+  </div>
+  <div class="gallery-item" data-img="images/satnik.jpg" data-label="Wardrobe">
+    <img src="thumbs/satnik.jpg" alt="Wardrobe" loading="lazy">
+    <div class="label">Wardrobe <span>&mdash; built-in storage</span></div>
+  </div>
+</div>
+
+<!-- Building & Entrance -->
+<h2 class="section-title">Building &amp; Surroundings</h2>
+<p class="section-subtitle">Modern residential building with secure entrance</p>
+
+<div class="gallery" id="gallery-building">
+  <div class="gallery-item featured" data-img="images/budova.jpg" data-label="Building — Exterior">
+    <img src="thumbs/budova.jpg" alt="Building — Exterior" loading="lazy">
+    <div class="label">Building <span>&mdash; exterior</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/vchod.jpg" data-label="Entrance">
+    <img src="thumbs/vchod.jpg" alt="Entrance" loading="lazy">
+    <div class="label">Entrance <span>&mdash; lobby</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/chodba-von.jpg" data-label="Hallway — Exterior View">
+    <img src="thumbs/chodba-von.jpg" alt="Hallway — Exterior View" loading="lazy">
+    <div class="label">Hallway <span>&mdash; exterior view</span></div>
+  </div>
+  <div class="gallery-item" data-img="images/img_4848.jpg" data-label="Additional View">
+    <img src="thumbs/img_4848.jpg" alt="Additional View" loading="lazy">
+    <div class="label">Additional View</div>
+  </div>
+  <div class="gallery-item" data-img="images/img_4849.jpg" data-label="Additional View">
+    <img src="thumbs/img_4849.jpg" alt="Additional View" loading="lazy">
+    <div class="label">Additional View</div>
+  </div>
+</div>
+
+<!-- Appraisal Photos -->
+<h2 class="section-title">Additional Photos</h2>
+<p class="section-subtitle">Supplementary documentation photos</p>
+
+<div class="gallery" id="gallery-extra">
+  <div class="gallery-item" data-img="images/znalecky-1.png" data-label="Appraisal Photo 1">
+    <img src="thumbs/znalecky-1.jpg" alt="Appraisal Photo 1" loading="lazy">
+    <div class="label">Photo 1</div>
+  </div>
+  <div class="gallery-item" data-img="images/znalecky-2.png" data-label="Appraisal Photo 2">
+    <img src="thumbs/znalecky-2.jpg" alt="Appraisal Photo 2" loading="lazy">
+    <div class="label">Photo 2</div>
+  </div>
+  <div class="gallery-item" data-img="images/znalecky-3.png" data-label="Appraisal Photo 3">
+    <img src="thumbs/znalecky-3.jpg" alt="Appraisal Photo 3" loading="lazy">
+    <div class="label">Photo 3</div>
+  </div>
+  <div class="gallery-item" data-img="images/znalecky-4.png" data-label="Appraisal Photo 4">
+    <img src="thumbs/znalecky-4.jpg" alt="Appraisal Photo 4" loading="lazy">
+    <div class="label">Photo 4</div>
+  </div>
+  <div class="gallery-item" data-img="images/znalecky-5.png" data-label="Appraisal Photo 5">
+    <img src="thumbs/znalecky-5.jpg" alt="Appraisal Photo 5" loading="lazy">
+    <div class="label">Photo 5</div>
+  </div>
+  <div class="gallery-item" data-img="images/znalecky-6.png" data-label="Appraisal Photo 6">
+    <img src="thumbs/znalecky-6.jpg" alt="Appraisal Photo 6" loading="lazy">
+    <div class="label">Photo 6</div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <button class="lightbox-nav lightbox-prev" aria-label="Previous">&#8249;</button>
+  <button class="lightbox-nav lightbox-next" aria-label="Next">&#8250;</button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+</div>
+
+<footer>
+  Apartment Showcase &middot; All photos &copy; owner
+</footer>
+
+<script>
+(function() {
+  const items = document.querySelectorAll('.gallery-item');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  const lbCaption = document.getElementById('lightbox-caption');
+  const lbCounter = document.getElementById('lightbox-counter');
+  let currentIndex = 0;
+  const allItems = Array.from(items);
+
+  function openLightbox(index) {
+    currentIndex = index;
+    updateLightbox();
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function updateLightbox() {
+    const item = allItems[currentIndex];
+    lbImg.src = item.dataset.img;
+    lbImg.alt = item.dataset.label;
+    lbCaption.textContent = item.dataset.label;
+    lbCounter.textContent = (currentIndex + 1) + ' / ' + allItems.length;
+  }
+
+  function navigate(dir) {
+    currentIndex = (currentIndex + dir + allItems.length) % allItems.length;
+    updateLightbox();
+  }
+
+  allItems.forEach(function(item, i) {
+    item.addEventListener('click', function() { openLightbox(i); });
+  });
+
+  document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+  document.querySelector('.lightbox-prev').addEventListener('click', function() { navigate(-1); });
+  document.querySelector('.lightbox-next').addEventListener('click', function() { navigate(1); });
+
+  lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+  });
+})();
+</script>
+</body>
+</html>
